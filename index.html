@@ -10,7 +10,7 @@
             --bg-color: #f8f9fa;
             --accent-color: #34495e;
             --danger-color: #e74c3c;
-            --success-color: #2ecc71;
+            --warning-color: #f1c40f;
             --plus-color: #3498db;
             --card-bg: #fff;
             --shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -43,7 +43,22 @@
             margin-bottom: 30px;
         }
 
-        .logo { font-size: 2.2rem; font-weight: bold; color: #333; }
+        .logo { 
+            font-size: 2.2rem; 
+            font-weight: bold; 
+            color: #333; 
+            display: flex;
+            align-items: baseline;
+        }
+
+        /* リアルタイム時計のスタイル */
+        .live-clock {
+            font-size: 1.1rem;
+            color: #888;
+            margin-left: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: normal;
+        }
 
         nav { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
 
@@ -126,11 +141,6 @@
             transition: 0.2s;
             flex-shrink: 0;
         }
-        .add-category-btn:hover {
-            background: var(--plus-color);
-            color: white;
-            border-style: solid;
-        }
 
         .add-btn {
             background: var(--plus-color);
@@ -146,17 +156,12 @@
             align-items: center;
             gap: 5px;
         }
-        .add-btn:hover { background: #2980b9; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
 
         .stock-grid {
             display: grid;
-            grid-template-columns: repeat(1, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
         }
-
-        @media (min-width: 600px) { .stock-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1000px) { .stock-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (min-width: 1300px) { .stock-grid { grid-template-columns: repeat(4, 1fr); } }
 
         .stock-card {
             background: var(--card-bg);
@@ -167,6 +172,22 @@
             transition: 0.3s;
             display: flex;
             flex-direction: column;
+            border: 2px solid transparent;
+        }
+
+        /* 在庫数に応じた色変化 */
+        .stock-card.warning {
+            background-color: #fff9db;
+            border-color: var(--warning-color);
+        }
+
+        .stock-card.danger {
+            background-color: #ffe3e3;
+            border-color: var(--danger-color);
+        }
+
+        .stock-card.danger .stock-count {
+            color: var(--danger-color);
         }
 
         .card-actions {
@@ -180,25 +201,17 @@
         .action-icon {
             background: none;
             border: none;
-            color: #ddd;
+            color: #ccc;
             font-size: 1.2rem;
             cursor: pointer;
             transition: 0.2s;
-            padding: 5px;
         }
-
-        .edit-stock:hover { color: var(--plus-color); transform: scale(1.1); }
-        .delete-stock:hover { color: var(--danger-color); transform: scale(1.1); }
 
         .item-name {
             font-size: 1.2rem;
             font-weight: bold;
-            display: block;
             margin-bottom: 5px;
-            text-align: left;
-            padding-right: 60px;
             min-height: 2.8rem;
-            line-height: 1.4;
         }
 
         .item-category-tag {
@@ -217,12 +230,11 @@
             justify-content: center;
             gap: 20px;
             margin-bottom: 15px;
-            background: #fcfcfc;
+            background: rgba(255, 255, 255, 0.5);
             padding: 15px;
             border-radius: 15px;
         }
 
-        .stock-label { font-size: 0.8rem; color: #777; }
         .stock-count { font-size: 1.8rem; font-weight: bold; min-width: 50px; text-align: center; }
 
         .count-btn {
@@ -232,18 +244,10 @@
             border: 1px solid #eee;
             background: white;
             font-size: 1.3rem;
-            font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
-            color: var(--accent-color);
-        }
-        .count-btn:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
-            border-color: var(--accent-color);
         }
 
         .update-date {
@@ -253,7 +257,7 @@
             margin-top: auto;
         }
 
-        .empty-msg { text-align: center; color: #aaa; padding: 100px 0; font-style: italic; }
+        .empty-msg { text-align: center; color: #aaa; padding: 100px 0; }
 
     </style>
 </head>
@@ -261,26 +265,28 @@
 
 <header>
     <div class="header-main">
-        <div class="logo">in'dex hair 管理システム</div>
+        <div class="logo">
+            in'dex hair <span id="clock" class="live-clock"></span>
+        </div>
     </div>
     <nav>
-        <a href="#" class="nav-item"><span>📅 カレンダー</span></a>
-        <a href="#" class="nav-item"><span>⏳ タイムライン</span></a>
-        <a href="#" class="nav-item"><span>🖼️ ギャラリー編集</span></a>
-        <a href="#" class="nav-item"><span>💰 売上管理</span></a>
-        <a href="#" class="nav-item active"><span>📦 在庫管理</span></a>
+        <a href="#" class="nav-item">📅 カレンダー</a>
+        <a href="#" class="nav-item">⏳ タイムライン</a>
+        <a href="#" class="nav-item">🖼️ ギャラリー編集</a>
+        <a href="#" class="nav-item">💰 売上管理</a>
+        <a href="#" class="nav-item active">📦 在庫管理</a>
     </nav>
 </header>
 
 <main>
     <div class="section-header">
         <span class="section-title">在庫一覧</span>
-        <button class="add-btn" onclick="addItem()"><span>＋</span> 追加</button>
+        <button class="add-btn" onclick="addItem()">＋ 追加</button>
     </div>
 
     <div class="category-container">
         <div class="category-nav" id="category-tabs"></div>
-        <button class="add-category-btn" onclick="addCategory()" title="カテゴリーを追加">＋</button>
+        <button class="add-category-btn" onclick="addCategory()">＋</button>
     </div>
 
     <div id="stock-list" class="stock-grid"></div>
@@ -288,157 +294,130 @@
 </main>
 
 <script>
-    // データの取得
-    let inventory = JSON.parse(localStorage.getItem('index_hair_stock')) || [
-        { id: 1, name: "ワックスA", count: 12, category: "その他", lastUpdate: "2026/05/05" }
-    ];
-
+    // データ管理
+    let inventory = JSON.parse(localStorage.getItem('index_hair_stock')) || [];
     let categories = JSON.parse(localStorage.getItem('index_hair_categories')) || ["すべて", "シャンプー", "カラー剤", "トリートメント", "その他"];
-
     let currentFilter = 'すべて';
 
-    // データの保存と再描画
     function saveData() {
         localStorage.setItem('index_hair_stock', JSON.stringify(inventory));
         localStorage.setItem('index_hair_categories', JSON.stringify(categories));
         renderAll();
     }
 
-    // カテゴリーの追加
+    // リアルタイム時計
+    function updateClock() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = (now.getMonth() + 1).toString().padStart(2, '0');
+        const d = now.getDate().toString().padStart(2, '0');
+        const hh = now.getHours().toString().padStart(2, '0');
+        const mm = now.getMinutes().toString().padStart(2, '0');
+        const ss = now.getSeconds().toString().padStart(2, '0');
+        document.getElementById('clock').textContent = `${y}/${m}/${d} ${hh}:${mm}:${ss}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // カテゴリー操作
     function addCategory() {
-        const newCat = prompt("追加する新しいカテゴリー名を入力してください：");
-        if (!newCat || newCat.trim() === "") return;
-        if (categories.includes(newCat)) {
-            alert("そのカテゴリーは既に存在します。");
-            return;
+        const name = prompt("新規カテゴリー名：");
+        if (!name) return;
+        if (!categories.includes(name)) {
+            categories.push(name);
+            currentFilter = name;
+            saveData();
         }
-        categories.push(newCat);
-        // 追加したらそのカテゴリーを選択状態にする
-        currentFilter = newCat;
-        saveData();
     }
 
-    // カテゴリーの切り替え
-    function filterCategory(category) {
-        currentFilter = category;
+    function filterCategory(cat) {
+        currentFilter = cat;
         renderAll();
     }
 
-    // 商品の追加
+    // 商品操作
     function addItem() {
-        // 1. 商品名の入力
-        const name = prompt("商品名を入力してください：");
-        if (!name || name.trim() === "") return;
-        
-        // 2. 現在選択されているカテゴリーを初期値に設定（「すべて」の場合は「その他」）
-        const initialCategory = (currentFilter === 'すべて') ? "その他" : currentFilter;
-        
-        // 3. カテゴリーの確認
-        const categoryList = categories.filter(c => c !== 'すべて').join('、');
-        const category = prompt(`カテゴリーを選択または入力してください\nリスト: ${categoryList}`, initialCategory);
-        
-        if (!category || category.trim() === "") return;
+        const name = prompt("商品名：");
+        if (!name) return;
 
-        // カテゴリーがリストになければ新しく追加
-        if (!categories.includes(category)) {
-            categories.push(category);
-        }
+        const defaultCat = (currentFilter === 'すべて') ? "その他" : currentFilter;
+        const category = prompt(`カテゴリーを選択（${categories.filter(c=>c!=='すべて').join('/')}）`, defaultCat);
+        if (!category) return;
 
-        // 4. 在庫データを作成して保存
-        const newItem = { 
-            id: Date.now(), 
-            name: name.trim(), 
-            count: 0, 
-            category: category.trim(), 
-            lastUpdate: getTodayStr() 
-        };
-        inventory.push(newItem);
-        
-        // 追加した商品のカテゴリーをそのまま表示し続ける
-        currentFilter = newItem.category;
+        if (!categories.includes(category)) categories.push(category);
+
+        inventory.push({
+            id: Date.now(),
+            name: name,
+            count: 0,
+            category: category,
+            lastUpdate: new Date().toLocaleDateString()
+        });
+        currentFilter = category;
         saveData();
-    }
-
-    function editItem(id) {
-        const item = inventory.find(i => i.id === id);
-        if (!item) return;
-        const newName = prompt("新しい商品名を入力してください：", item.name);
-        if (newName && newName.trim() !== "") {
-            item.name = newName.trim();
-            item.lastUpdate = getTodayStr();
-            saveData();
-        }
     }
 
     function changeStock(id, amount) {
         const item = inventory.find(i => i.id === id);
         if (item) {
             item.count = Math.max(0, item.count + amount);
-            item.lastUpdate = getTodayStr();
+            item.lastUpdate = new Date().toLocaleDateString();
             saveData();
         }
     }
 
     function deleteItem(id) {
-        if (!confirm("この商品を削除してもよろしいですか？")) return;
-        inventory = inventory.filter(i => i.id !== id);
-        saveData();
-    }
-
-    function getTodayStr() {
-        const now = new Date();
-        return `${now.getFullYear()}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')}`;
-    }
-
-    function renderTabs() {
-        const tabs = document.getElementById('category-tabs');
-        tabs.innerHTML = categories.map(cat => `
-            <button class="category-btn ${currentFilter === cat ? 'active' : ''}" 
-                    onclick="filterCategory('${cat}')">${cat}</button>
-        `).join('');
-    }
-
-    function renderInventory() {
-        const list = document.getElementById('stock-list');
-        const empty = document.getElementById('empty-msg');
-        
-        const displayList = currentFilter === 'すべて' 
-            ? inventory 
-            : inventory.filter(item => item.category === currentFilter);
-
-        if (displayList.length === 0) {
-            list.innerHTML = "";
-            empty.style.display = "block";
-            return;
+        if (confirm("削除しますか？")) {
+            inventory = inventory.filter(i => i.id !== id);
+            saveData();
         }
-
-        empty.style.display = "none";
-        list.innerHTML = displayList.map(item => `
-            <div class="stock-card">
-                <div class="card-actions">
-                    <button class="action-icon edit-stock" onclick="editItem(${item.id})" title="編集">✎</button>
-                    <button class="action-icon delete-stock" onclick="deleteItem(${item.id})" title="削除">🗑</button>
-                </div>
-                <div class="item-category-tag">${item.category}</div>
-                <span class="item-name">${item.name}</span>
-                
-                <div class="stock-control">
-                    <button class="count-btn" onclick="changeStock(${item.id}, -1)">−</button>
-                    <div>
-                        <div class="stock-label">在庫</div>
-                        <div class="stock-count">${item.count}</div>
-                    </div>
-                    <button class="count-btn" onclick="changeStock(${item.id}, 1)">＋</button>
-                </div>
-                
-                <div class="update-date">最終更新：${item.lastUpdate}</div>
-            </div>
-        `).join('');
     }
 
+    function editItem(id) {
+        const item = inventory.find(i => i.id === id);
+        const newName = prompt("新しい商品名：", item.name);
+        if (newName) {
+            item.name = newName;
+            saveData();
+        }
+    }
+
+    // 描画処理
     function renderAll() {
-        renderTabs();
-        renderInventory();
+        // タブの描画
+        document.getElementById('category-tabs').innerHTML = categories.map(cat => `
+            <button class="category-btn ${currentFilter === cat ? 'active' : ''}" onclick="filterCategory('${cat}')">${cat}</button>
+        `).join('');
+
+        // リストの描画
+        const list = document.getElementById('stock-list');
+        const filtered = currentFilter === 'すべて' ? inventory : inventory.filter(i => i.category === currentFilter);
+        
+        document.getElementById('empty-msg').style.display = filtered.length ? 'none' : 'block';
+
+        list.innerHTML = filtered.map(item => {
+            // 色判定
+            let status = "";
+            if (item.count <= 2) status = "danger";
+            else if (item.count <= 5) status = "warning";
+
+            return `
+                <div class="stock-card ${status}">
+                    <div class="card-actions">
+                        <button class="action-icon" onclick="editItem(${item.id})">✎</button>
+                        <button class="action-icon" onclick="deleteItem(${item.id})">🗑</button>
+                    </div>
+                    <div class="item-category-tag">${item.category}</div>
+                    <div class="item-name">${item.name}</div>
+                    <div class="stock-control">
+                        <button class="count-btn" onclick="changeStock(${item.id}, -1)">-</button>
+                        <div class="stock-count">${item.count}</div>
+                        <button class="count-btn" onclick="changeStock(${item.id}, 1)">+</button>
+                    </div>
+                    <div class="update-date">更新: ${item.lastUpdate}</div>
+                </div>
+            `;
+        }).join('');
     }
 
     renderAll();
