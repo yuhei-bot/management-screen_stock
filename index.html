@@ -138,11 +138,11 @@
         <div class="logo">in'dex hair <span id="clock" class="live-clock"></span></div>
     </div>
     <nav>
-        <a href="#" class="nav-item">📅 カレンダー</a>
-        <a href="#" class="nav-item">⏳ タイムライン</a>
-        <a href="#" class="nav-item">🖼️ ギャラリー編集</a>
-        <a href="#" class="nav-item">💰 売上管理</a>
-        <a href="#" class="nav-item active">📦 在庫管理</a>
+        <div class="nav-item active" id="btn-calendar" onclick="switchView('calendar')">📅 カレンダー</div>
+        <div class="nav-item" id="btn-timeline" onclick="switchView('timeline')">⏳ タイムライン</div>
+        <div class="nav-item disabled">🖼️ ギャラリー編集</div>
+        <div class="nav-item disabled">💰 売上管理</div>
+        <div class="nav-item disabled">📦 在庫管理</div>
     </nav>
 </header>
 
